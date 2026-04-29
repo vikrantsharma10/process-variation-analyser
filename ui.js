@@ -303,15 +303,6 @@ function copyOutput(type) {
   });
 }
 
-// ANALYSIS TOGGLE
-
-function toggleAnalysis() {
-  const body = document.getElementById('analysis-toggle-body');
-  const btn = document.querySelector('.analysis-toggle-btn');
-  const isOpen = body.classList.toggle('open');
-  btn.textContent = isOpen ? 'HIDE 7-STAGE ANALYSIS ↑' : 'VIEW 7-STAGE ANALYSIS ↓';
-}
-
 function resetForm() {
   document.getElementById('results-section').classList.remove('visible');
   document.getElementById('input-anchor').scrollIntoView({ behavior: 'smooth' });
