@@ -126,9 +126,9 @@ async function runDiagnosis() {
   showLoading();
 
   try {
-    const resultText = await runEngine(processName, context, audience, regions);
+    const result = await runEngine(processName, context, audience, regions);
     hideLoading();
-    renderResults(processName, resultText);
+    renderResults(processName, result);
   } catch (e) {
     hideLoading();
     alert('Something went wrong running the diagnosis. Please try again.');
@@ -162,54 +162,192 @@ function hideLoading() {
   overlay.classList.remove('active');
 }
 
-// RESULTS RENDERER — plain text
+// MARKDOWN PARSER — strips symbols, styles headings and tables
 
-function renderResults(processName, text) {
-  document.getElementById('results-title').textContent = processName;
+function parseMarkdown(text) {
+  const lines = text.split('\n');
+  let html = '';
+  let inTable = false;
+  let tableRows = [];
+  let inCodeBlock = false;
 
-  // Split into the two output sections
-  const poMarker = 'PROCESS OWNER DIAGNOSIS';
-  const execMarker = 'EXECUTIVE LEADERSHIP DIAGNOSIS';
+  function flushTable() {
+    if (tableRows.length === 0) return;
 
-  let poText = '';
-  let execText = '';
+    // First row = header, second row = separator (skip), rest = body
+    const headerCells = tableRows[0];
+    const bodyRows = tableRows.slice(2);
 
-  const poIdx = text.indexOf(poMarker);
-  const execIdx = text.indexOf(execMarker);
-
-  if (poIdx !== -1 && execIdx !== -1) {
-    if (poIdx < execIdx) {
-      poText = text.slice(poIdx, execIdx).trim();
-      execText = text.slice(execIdx).trim();
-    } else {
-      execText = text.slice(execIdx, poIdx).trim();
-      poText = text.slice(poIdx).trim();
-    }
-  } else {
-    poText = text;
-    execText = '';
+    let tableHTML = '<div class="output-table-wrap"><table class="output-table"><thead><tr>';
+    headerCells.forEach(cell => {
+      tableHTML += `<th>${cell}</th>`;
+    });
+    tableHTML += '</tr></thead><tbody>';
+    bodyRows.forEach(row => {
+      tableHTML += '<tr>';
+      row.forEach(cell => {
+        tableHTML += `<td>${cell}</td>`;
+      });
+      tableHTML += '</tr>';
+    });
+    tableHTML += '</tbody></table></div>';
+    html += tableHTML;
+    tableRows = [];
+    inTable = false;
   }
 
-  document.getElementById('process-owner-output').textContent = poText;
-  document.getElementById('exec-output').textContent = execText;
+  function parseCells(line) {
+    return line
+      .replace(/^\|/, '')
+      .replace(/\|$/, '')
+      .split('|')
+      .map(c => c.trim());
+  }
+
+  function isSeparator(cells) {
+    return cells.every(c => /^[-:]+$/.test(c));
+  }
+
+  function styleInline(str) {
+    // Remove bold/italic markers, keep plain text
+    return str
+      .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/__(.+?)__/g, '$1')
+      .replace(/_(.+?)_/g, '$1')
+      .replace(/`(.+?)`/g, '<code>$1</code>');
+  }
+
+  lines.forEach(line => {
+    // Code blocks — render as-is
+    if (line.startsWith('```')) {
+      if (inTable) flushTable();
+      if (inCodeBlock) {
+        html += '</pre>';
+        inCodeBlock = false;
+      } else {
+        html += '<pre class="output-code">';
+        inCodeBlock = true;
+      }
+      return;
+    }
+    if (inCodeBlock) {
+      html += escapeHTML(line) + '\n';
+      return;
+    }
+
+    // Table rows
+    if (line.startsWith('|')) {
+      const cells = parseCells(line);
+      if (isSeparator(cells)) {
+        tableRows.push(cells); // keep separator so we can skip it
+      } else {
+        tableRows.push(cells);
+      }
+      inTable = true;
+      return;
+    } else if (inTable) {
+      flushTable();
+    }
+
+    // Headings — strip #, apply colour class
+    const h3 = line.match(/^###\s+(.*)/);
+    const h2 = line.match(/^##\s+(.*)/);
+    const h1 = line.match(/^#\s+(.*)/);
+
+    if (h1) {
+      html += `<h1 class="output-h1">${styleInline(h1[1])}</h1>`;
+      return;
+    }
+    if (h2) {
+      html += `<h2 class="output-h2">${styleInline(h2[1])}</h2>`;
+      return;
+    }
+    if (h3) {
+      html += `<h3 class="output-h3">${styleInline(h3[1])}</h3>`;
+      return;
+    }
+
+    // Horizontal rule
+    if (/^---+$/.test(line.trim())) {
+      html += '<hr class="output-hr">';
+      return;
+    }
+
+    // Bullet points
+    const bullet = line.match(/^[\*\-]\s+(.*)/);
+    if (bullet) {
+      html += `<div class="output-bullet">· ${styleInline(bullet[1])}</div>`;
+      return;
+    }
+
+    // Numbered list
+    const numbered = line.match(/^(\d+)\.\s+(.*)/);
+    if (numbered) {
+      html += `<div class="output-numbered"><span class="output-num">${numbered[1]}.</span> ${styleInline(numbered[2])}</div>`;
+      return;
+    }
+
+    // Empty line
+    if (line.trim() === '') {
+      html += '<div class="output-spacer"></div>';
+      return;
+    }
+
+    // Plain paragraph
+    html += `<p class="output-p">${styleInline(line)}</p>`;
+  });
+
+  if (inTable) flushTable();
+  if (inCodeBlock) html += '</pre>';
+
+  return html;
+}
+
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// RESULTS RENDERER
+
+function renderResults(processName, result) {
+  document.getElementById('results-title').textContent = processName;
+
+  const poText = result.processOwnerText || '';
+  const execText = result.execText || '';
+
+  const poEl = document.getElementById('process-owner-output');
+  const execEl = document.getElementById('exec-output');
+
+  poEl.innerHTML = parseMarkdown(poText) + buildFooter();
+  execEl.innerHTML = parseMarkdown(execText) + buildFooter();
 
   const resultsEl = document.getElementById('results-section');
   resultsEl.classList.add('visible');
   resultsEl.scrollIntoView({ behavior: 'smooth' });
 }
 
-// COPY
+function buildFooter() {
+  return `<div class="output-footer-credit">Built by <a href="https://www.linkedin.com/in/vikrantsharma10/" target="_blank" rel="noopener">Vikrant Sharma</a></div>`;
+}
+
+// COPY — top-right button in each box
 
 function copyOutput(type) {
   const elId = type === 'process-owner' ? 'process-owner-output' : 'exec-output';
-  const processName = document.getElementById('results-title').textContent;
-  const content = document.getElementById(elId).textContent;
+  const content = document.getElementById(elId).innerText;
   const text = `${content}\n\nBuilt by Vikrant Sharma - https://www.linkedin.com/in/vikrantsharma10/`;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    btn.textContent = 'COPIED';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'COPY AS TEXT'; btn.classList.remove('copied'); }, 2000);
+    const btn = document.querySelector(`[data-copy="${type}"]`);
+    if (btn) {
+      btn.textContent = 'COPIED';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+    }
   });
 }
 
