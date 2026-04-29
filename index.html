@@ -190,16 +190,23 @@
   </div>
 
   <div class="analysis-grid">
+
     <div class="analysis-card">
-      <div class="analysis-card-label">PROCESS OWNER DIAGNOSIS</div>
-      <pre id="process-owner-output" class="output-pre"></pre>
-      <button class="copy-btn" onclick="copyOutput('process-owner')">COPY AS TEXT</button>
+      <div class="analysis-card-header">
+        <div class="analysis-card-label">PROCESS OWNER DIAGNOSIS</div>
+        <button class="output-copy-btn" data-copy="process-owner" onclick="copyOutput('process-owner')">COPY</button>
+      </div>
+      <div id="process-owner-output" class="output-rendered"></div>
     </div>
+
     <div class="analysis-card">
-      <div class="analysis-card-label">EXECUTIVE LEADERSHIP DIAGNOSIS</div>
-      <pre id="exec-output" class="output-pre"></pre>
-      <button class="copy-btn" onclick="copyOutput('exec')">COPY AS TEXT</button>
+      <div class="analysis-card-header">
+        <div class="analysis-card-label">EXECUTIVE LEADERSHIP DIAGNOSIS</div>
+        <button class="output-copy-btn" data-copy="exec" onclick="copyOutput('exec')">COPY</button>
+      </div>
+      <div id="exec-output" class="output-rendered"></div>
     </div>
+
   </div>
 
   <div class="run-again-wrap">
