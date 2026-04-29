@@ -409,3 +409,108 @@ footer {
   .regions-grid, .regions-grid.cols-3, .regions-grid.cols-4 { grid-template-columns: 1fr; }
   .market-cards, .divergence-wrap, .constraint-box, .pareto-wrap, .analysis-grid, .run-again-wrap, .results-header { padding-left: 20px; padding-right: 20px; }
 }
+
+/* OUTPUT BOX WRAPPER — position relative for copy button */
+.output-box {
+  position: relative;
+}
+
+.output-copy-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: 1px solid #c8f135;
+  color: #c8f135;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s;
+}
+
+.output-copy-btn:hover,
+.output-copy-btn.copied {
+  background: #c8f135;
+  color: #000;
+}
+
+/* HEADINGS */
+.output-h1 { color: #c8f135; font-size: 1.2em; font-weight: 600; margin: 1.2em 0 0.4em; }
+.output-h2 { color: #c8f135; font-size: 1.05em; font-weight: 600; margin: 1em 0 0.3em; }
+.output-h3 { color: #c8f135; font-size: 0.95em; font-weight: 600; margin: 0.8em 0 0.3em; }
+
+/* TABLES */
+.output-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+
+.output-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+  table-layout: auto;
+}
+
+.output-table th {
+  color: #c8f135;
+  text-align: left;
+  padding: 6px 12px;
+  border-bottom: 1px solid #c8f13540;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.output-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #ffffff10;
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.output-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* BULLETS & NUMBERED */
+.output-bullet {
+  padding: 3px 0 3px 1em;
+  line-height: 1.6;
+}
+
+.output-numbered {
+  padding: 3px 0 3px 1em;
+  line-height: 1.6;
+}
+
+.output-num {
+  color: #c8f135;
+  margin-right: 6px;
+}
+
+/* MISC */
+.output-hr { border: none; border-top: 1px solid #ffffff15; margin: 1em 0; }
+.output-spacer { height: 0.5em; }
+.output-p { margin: 0.3em 0; line-height: 1.6; }
+.output-code { font-size: 0.8em; background: #ffffff08; padding: 10px; overflow-x: auto; white-space: pre; }
+
+/* FOOTER CREDIT */
+.output-footer-credit {
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid #ffffff15;
+  font-size: 0.78em;
+  color: #666;
+}
+
+.output-footer-credit a {
+  color: #888;
+  text-decoration: underline;
+}
+
+.output-footer-credit a:hover {
+  color: #c8f135;
+}
