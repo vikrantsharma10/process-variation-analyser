@@ -162,7 +162,7 @@ function hideLoading() {
   overlay.classList.remove('active');
 }
 
-// MARKDOWN PARSER — strips symbols, styles headings and tables
+// MARKDOWN PARSER
 
 function parseMarkdown(text) {
   const lines = text.split('\n');
@@ -173,21 +173,14 @@ function parseMarkdown(text) {
 
   function flushTable() {
     if (tableRows.length === 0) return;
-
-    // First row = header, second row = separator (skip), rest = body
     const headerCells = tableRows[0];
     const bodyRows = tableRows.slice(2);
-
     let tableHTML = '<div class="output-table-wrap"><table class="output-table"><thead><tr>';
-    headerCells.forEach(cell => {
-      tableHTML += `<th>${cell}</th>`;
-    });
+    headerCells.forEach(cell => { tableHTML += `<th>${cell}</th>`; });
     tableHTML += '</tr></thead><tbody>';
     bodyRows.forEach(row => {
       tableHTML += '<tr>';
-      row.forEach(cell => {
-        tableHTML += `<td>${cell}</td>`;
-      });
+      row.forEach(cell => { tableHTML += `<td>${cell}</td>`; });
       tableHTML += '</tr>';
     });
     tableHTML += '</tbody></table></div>';
@@ -197,11 +190,7 @@ function parseMarkdown(text) {
   }
 
   function parseCells(line) {
-    return line
-      .replace(/^\|/, '')
-      .replace(/\|$/, '')
-      .split('|')
-      .map(c => c.trim());
+    return line.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
   }
 
   function isSeparator(cells) {
@@ -209,7 +198,6 @@ function parseMarkdown(text) {
   }
 
   function styleInline(str) {
-    // Remove bold/italic markers, keep plain text
     return str
       .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
       .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -220,82 +208,41 @@ function parseMarkdown(text) {
   }
 
   lines.forEach(line => {
-    // Code blocks — render as-is
     if (line.startsWith('```')) {
       if (inTable) flushTable();
-      if (inCodeBlock) {
-        html += '</pre>';
-        inCodeBlock = false;
-      } else {
-        html += '<pre class="output-code">';
-        inCodeBlock = true;
-      }
+      if (inCodeBlock) { html += '</pre>'; inCodeBlock = false; }
+      else { html += '<pre class="output-code">'; inCodeBlock = true; }
       return;
     }
-    if (inCodeBlock) {
-      html += escapeHTML(line) + '\n';
-      return;
-    }
+    if (inCodeBlock) { html += escapeHTML(line) + '\n'; return; }
 
-    // Table rows
     if (line.startsWith('|')) {
       const cells = parseCells(line);
-      if (isSeparator(cells)) {
-        tableRows.push(cells); // keep separator so we can skip it
-      } else {
-        tableRows.push(cells);
-      }
+      tableRows.push(cells);
       inTable = true;
       return;
     } else if (inTable) {
       flushTable();
     }
 
-    // Headings — strip #, apply colour class
     const h3 = line.match(/^###\s+(.*)/);
     const h2 = line.match(/^##\s+(.*)/);
     const h1 = line.match(/^#\s+(.*)/);
 
-    if (h1) {
-      html += `<h1 class="output-h1">${styleInline(h1[1])}</h1>`;
-      return;
-    }
-    if (h2) {
-      html += `<h2 class="output-h2">${styleInline(h2[1])}</h2>`;
-      return;
-    }
-    if (h3) {
-      html += `<h3 class="output-h3">${styleInline(h3[1])}</h3>`;
-      return;
-    }
+    if (h1) { html += `<h1 class="output-h1">${styleInline(h1[1])}</h1>`; return; }
+    if (h2) { html += `<h2 class="output-h2">${styleInline(h2[1])}</h2>`; return; }
+    if (h3) { html += `<h3 class="output-h3">${styleInline(h3[1])}</h3>`; return; }
 
-    // Horizontal rule
-    if (/^---+$/.test(line.trim())) {
-      html += '<hr class="output-hr">';
-      return;
-    }
+    if (/^---+$/.test(line.trim())) { html += '<hr class="output-hr">'; return; }
 
-    // Bullet points
     const bullet = line.match(/^[\*\-]\s+(.*)/);
-    if (bullet) {
-      html += `<div class="output-bullet">· ${styleInline(bullet[1])}</div>`;
-      return;
-    }
+    if (bullet) { html += `<div class="output-bullet">· ${styleInline(bullet[1])}</div>`; return; }
 
-    // Numbered list
     const numbered = line.match(/^(\d+)\.\s+(.*)/);
-    if (numbered) {
-      html += `<div class="output-numbered"><span class="output-num">${numbered[1]}.</span> ${styleInline(numbered[2])}</div>`;
-      return;
-    }
+    if (numbered) { html += `<div class="output-numbered"><span class="output-num">${numbered[1]}.</span> ${styleInline(numbered[2])}</div>`; return; }
 
-    // Empty line
-    if (line.trim() === '') {
-      html += '<div class="output-spacer"></div>';
-      return;
-    }
+    if (line.trim() === '') { html += '<div class="output-spacer"></div>'; return; }
 
-    // Plain paragraph
     html += `<p class="output-p">${styleInline(line)}</p>`;
   });
 
@@ -306,10 +253,7 @@ function parseMarkdown(text) {
 }
 
 function escapeHTML(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // RESULTS RENDERER
@@ -317,14 +261,22 @@ function escapeHTML(str) {
 function renderResults(processName, result) {
   document.getElementById('results-title').textContent = processName;
 
-  const poText = result.processOwnerText || '';
-  const execText = result.execText || '';
-
   const poEl = document.getElementById('process-owner-output');
   const execEl = document.getElementById('exec-output');
+  const analysisEl = document.getElementById('analysis-output');
 
-  poEl.innerHTML = parseMarkdown(poText) + buildFooter();
-  execEl.innerHTML = parseMarkdown(execText) + buildFooter();
+  poEl.innerHTML = parseMarkdown(result.processOwnerText || '') + buildFooter();
+  execEl.innerHTML = parseMarkdown(result.execText || '') + buildFooter();
+
+  if (analysisEl) {
+    analysisEl.innerHTML = parseMarkdown(result.analysisText || '');
+  }
+
+  // Reset toggle state on new diagnosis
+  const toggleBody = document.getElementById('analysis-toggle-body');
+  const toggleBtn = document.querySelector('.analysis-toggle-btn');
+  if (toggleBody) toggleBody.classList.remove('open');
+  if (toggleBtn) toggleBtn.textContent = 'VIEW 7-STAGE ANALYSIS ↓';
 
   const resultsEl = document.getElementById('results-section');
   resultsEl.classList.add('visible');
@@ -335,7 +287,7 @@ function buildFooter() {
   return `<div class="output-footer-credit">Built by <a href="https://www.linkedin.com/in/vikrantsharma10/" target="_blank" rel="noopener">Vikrant Sharma</a></div>`;
 }
 
-// COPY — top-right button in each box
+// COPY
 
 function copyOutput(type) {
   const elId = type === 'process-owner' ? 'process-owner-output' : 'exec-output';
@@ -349,6 +301,15 @@ function copyOutput(type) {
       setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
     }
   });
+}
+
+// ANALYSIS TOGGLE
+
+function toggleAnalysis() {
+  const body = document.getElementById('analysis-toggle-body');
+  const btn = document.querySelector('.analysis-toggle-btn');
+  const isOpen = body.classList.toggle('open');
+  btn.textContent = isOpen ? 'HIDE 7-STAGE ANALYSIS ↑' : 'VIEW 7-STAGE ANALYSIS ↓';
 }
 
 function resetForm() {
