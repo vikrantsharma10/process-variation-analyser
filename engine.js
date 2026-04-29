@@ -20,6 +20,7 @@ Run all 7 diagnostic stages internally:
 5. Step Classification — stamp each step: Standardise / Modify / Keep Local
 6. Theory of Constraints — identify the single binding bottleneck; suppress non-constraint recommendations until bottleneck resolved
 7. Pareto Filter — identify top 20% of fixes delivering 80% improvement; P1-P4 priority actions max; max 2 secondary actions
+Keep all string values concise — maximum 15 words per string value in the JSON.
 
 Return this exact JSON structure:
 {
@@ -61,7 +62,7 @@ async function runEngine(processName, audience, regions) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 4000,
+      max_tokens: 6000,
       messages: [{ role: 'user', content: prompt }]
     })
   });
