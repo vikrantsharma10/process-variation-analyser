@@ -409,28 +409,6 @@ footer {
 .output-footer-credit a { color: var(--text-muted); text-decoration: underline; }
 .output-footer-credit a:hover { color: var(--accent); }
 
-/* 7-STAGE ANALYSIS TOGGLE */
-.analysis-toggle-wrap {
-  padding: 24px 56px;
-  border-bottom: 1px solid var(--border);
-}
-.analysis-toggle-btn {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em;
-  color: var(--text-muted); background: transparent;
-  border: 1px solid var(--border2); border-radius: 0;
-  padding: 10px 20px; cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-.analysis-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
-.analysis-toggle-body {
-  display: none;
-  margin-top: 24px;
-  padding: 28px 32px;
-  border: 1px solid var(--border);
-  background: var(--bg2);
-}
-.analysis-toggle-body.open { display: block; }
-
 /* RUN AGAIN */
 .run-again-wrap { padding: 32px 56px; }
 .run-again-btn {
