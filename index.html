@@ -187,47 +187,18 @@
   <div class="results-header">
     <div class="results-eyebrow">DIAGNOSIS COMPLETE</div>
     <div class="results-title" id="results-title">Regional Process Variation Report</div>
-    <div class="results-process" id="results-process-label"></div>
   </div>
 
-  <div class="market-cards" id="market-cards"></div>
-
-  <div class="constraint-box" id="constraint-box">
-    <div class="constraint-label">BINDING CONSTRAINT — THEORY OF CONSTRAINTS</div>
-    <div class="constraint-text" id="constraint-text"></div>
-  </div>
-
-  <div class="divergence-wrap">
-    <div class="divergence-label">STEP-BY-STEP DIVERGENCE MAP</div>
-    <div style="overflow-x:auto;">
-      <table class="divergence-table" id="divergence-table">
-        <thead id="divergence-thead"></thead>
-        <tbody id="divergence-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="pareto-wrap">
-    <div class="pareto-label">PRIORITY ACTIONS — PARETO FILTER</div>
-    <div class="priority-actions" id="priority-actions"></div>
-    <div class="secondary-actions">
-      <div class="secondary-label">SECONDARY ACTIONS — HOLD UNTIL PRIORITIES RESOLVED</div>
-      <div id="secondary-actions"></div>
-    </div>
-  </div>
-
-  <div class="analysis-grid" id="analysis-grid">
-    <div class="analysis-card" id="process-owner-card">
+  <div class="analysis-grid">
+    <div class="analysis-card">
       <div class="analysis-card-label">PROCESS OWNER DIAGNOSIS</div>
-      <h4>Operational breakdown.</h4>
-      <ul class="analysis-list" id="process-owner-list"></ul>
-      <button class="copy-btn" onclick="copyOutput('process-owner')">COPY AS TEXT ↗</button>
+      <pre id="process-owner-output" class="output-pre"></pre>
+      <button class="copy-btn" onclick="copyOutput('process-owner')">COPY AS TEXT</button>
     </div>
-    <div class="analysis-card" id="exec-card">
+    <div class="analysis-card">
       <div class="analysis-card-label">EXECUTIVE LEADERSHIP DIAGNOSIS</div>
-      <h4>Commercial framing.</h4>
-      <ul class="analysis-list" id="exec-list"></ul>
-      <button class="copy-btn" onclick="copyOutput('exec')">COPY AS TEXT ↗</button>
+      <pre id="exec-output" class="output-pre"></pre>
+      <button class="copy-btn" onclick="copyOutput('exec')">COPY AS TEXT</button>
     </div>
   </div>
 
