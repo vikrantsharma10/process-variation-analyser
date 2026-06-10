@@ -13,19 +13,19 @@ function createRegionCol(index) {
   col.innerHTML = `
     <div class="region-header">
       <input class="region-name-input" type="text" placeholder="${label}" data-region="${index}">
-      ${index > 2 ? `<button class="remove-region" onclick="removeRegion(${index})">x</button>` : ''}
+      ${index > 2 ? `<button class="remove-region" onclick="removeRegion(${index})">×</button>` : ''}
     </div>
     <div class="steps-header">
-      <span>STEP DESCRIPTION</span><span>TAT</span>
+      <span>Step Description</span><span>TAT</span>
     </div>
     <div class="step-rows" data-region="${index}">
       ${stepRowHTML(index, 1)}
       ${stepRowHTML(index, 2)}
       ${stepRowHTML(index, 3)}
     </div>
-    <button class="add-step-btn" onclick="addStep(${index})">+ ADD ANOTHER STEP</button>
+    <button class="add-step-btn" onclick="addStep(${index})">+ Add another step</button>
     <div class="region-footer">
-      <label class="hc-label">ESTIMATED HEADCOUNT INVOLVED IN THIS PROCESS</label>
+      <label class="hc-label">Estimated headcount involved</label>
       <select class="hc-select" data-region="${index}">
         <option value="1-5">1-5 people</option>
         <option value="6-15">6-15 people</option>
@@ -65,7 +65,7 @@ function updateAddBtn() {
   const btn = document.getElementById('add-region-btn');
   const label = document.getElementById('region-count-label');
   btn.disabled = regionCount >= MAX_REGIONS;
-  label.textContent = `${regionCount} OF ${MAX_REGIONS} REGIONS ADDED`;
+  label.textContent = `${regionCount} of ${MAX_REGIONS} regions added`;
 }
 
 function addRegion() {
@@ -296,9 +296,9 @@ function copyOutput(type) {
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.querySelector(`[data-copy="${type}"]`);
     if (btn) {
-      btn.textContent = 'COPIED';
+      btn.textContent = 'Copied';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
     }
   });
 }
